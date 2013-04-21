@@ -1,17 +1,33 @@
 package relop;
 
+import java.util.ArrayList;
+
 /**
  * The simplest of all join algorithms: nested loops (see textbook, 3rd edition,
  * section 14.4.1, page 454).
  */
 public class SimpleJoin extends Iterator {
-
+Schema schema;
+ArrayList<Tuple> tuples = new ArrayList<Tuple>();
+java.util.Iterator<Tuple> iter;
   /**
    * Constructs a join, given the left and right iterators and join predicates
    * (relative to the combined schema).
    */
   public SimpleJoin(Iterator left, Iterator right, Predicate... preds) {
-    throw new UnsupportedOperationException("Not implemented");
+    schema = Schema.join(left.getSchema(), right.getSchema());
+    //Begin algorithm
+    while(left.hasNext()){
+    	Tuple l = left.getNext();
+    	while(right.hasNext()){
+    		Tuple r = right.getNext();
+    		if(l.equals(r)){
+    			tuples.add(Tuple.join(l,r,schema));
+    		}
+        }
+    }
+    this.iter = tuples.iterator();
+    this.setSchema(schema);
   }
 
   /**
@@ -19,35 +35,35 @@ public class SimpleJoin extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-    throw new UnsupportedOperationException("Not implemented");
+    //TODO:
   }
 
   /**
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
-    throw new UnsupportedOperationException("Not implemented");
+	  iter = tuples.iterator();
   }
 
   /**
    * Returns true if the iterator is open; false otherwise.
    */
   public boolean isOpen() {
-    throw new UnsupportedOperationException("Not implemented");
+	  return iter != null;
   }
 
   /**
    * Closes the iterator, releasing any resources (i.e. pinned pages).
    */
   public void close() {
-    throw new UnsupportedOperationException("Not implemented");
+	  iter = null;
   }
 
   /**
    * Returns true if there are more tuples, false otherwise.
    */
   public boolean hasNext() {
-    throw new UnsupportedOperationException("Not implemented");
+    return iter.hasNext();
   }
 
   /**
@@ -56,7 +72,7 @@ public class SimpleJoin extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    throw new UnsupportedOperationException("Not implemented");
+    return iter.next();
   }
 
 } // public class SimpleJoin extends Iterator

@@ -9,7 +9,6 @@ import heap.HeapScan;
  * version takes schema into consideration and generates real tuples.
  */
 public class FileScan extends Iterator {
-Schema schema;
 HeapFile file;
 HeapScan hs;
 boolean closed;
@@ -18,7 +17,7 @@ RID lastrid;
    * Constructs a file scan, given the schema and heap file.
    */
   public FileScan(Schema schema, HeapFile file) {
-    this.schema = schema;
+    this.setSchema(schema);
     this.file = file;
     hs = file.openScan();
     closed = false;
@@ -53,7 +52,6 @@ RID lastrid;
   public void close() {
 	  hs.close();
 	  closed = true;
-    throw new UnsupportedOperationException("Not implemented");
   }
 
   /**
@@ -71,7 +69,7 @@ RID lastrid;
   public Tuple getNext() {
 	  if(this.hasNext()){
 		  lastrid = new RID();
-		  return new Tuple(schema, hs.getNext(lastrid));
+		  return new Tuple(this.getSchema(), hs.getNext(lastrid));
 	  }
 	  else{
 		  //DOUBT: Do Nothing

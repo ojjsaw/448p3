@@ -2,29 +2,36 @@ package relop;
 
 import java.util.ArrayList;
 
+import externalSort.SortMergeJoin;
+
 /**
  * The selection operator specifies which tuples to retain under a condition; in
  * Minibase, this condition is simply a set of independent predicates logically
  * connected by OR operators.
  */
 public class Selection extends Iterator {
-Iterator iter;
 ArrayList<Tuple> tuples = new ArrayList<Tuple>();
+java.util.Iterator<Tuple> iter;
   /**
    * Constructs a selection, given the underlying iterator and predicates.
    */
   public Selection(Iterator iter, Predicate... preds) {
-    this.iter = iter;
+    Schema schema = iter.getSchema();
     for(Predicate pred : preds){
     	Tuple t = iter.getNext();
     	if(pred.evaluate(t)){
     		tuples.add(t);
     	}
     }
-    this.iter = (Iterator)tuples.iterator();
+    this.setSchema(schema);
+    this.iter = tuples.iterator();
   }
 
-  /**
+  public Selection(SortMergeJoin join2, Predicate predicate) {
+	// TODO Auto-generated constructor stub
+}
+
+/**
    * Gives a one-line explaination of the iterator, repeats the call on any
    * child iterators, and increases the indent depth along the way.
    */
@@ -36,21 +43,21 @@ ArrayList<Tuple> tuples = new ArrayList<Tuple>();
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
-    iter.restart();
+    iter = tuples.iterator();
   }
 
   /**
    * Returns true if the iterator is open; false otherwise.
    */
   public boolean isOpen() {
-    return iter.isOpen();
+    return iter != null;
   }
 
   /**
    * Closes the iterator, releasing any resources (i.e. pinned pages).
    */
   public void close() {
-    iter.close();
+    iter = null;
   }
 
   /**
@@ -66,7 +73,7 @@ ArrayList<Tuple> tuples = new ArrayList<Tuple>();
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-	return iter.getNext();
+	return iter.next();
   }
 
 } // public class Selection extends Iterator

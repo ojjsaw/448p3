@@ -11,7 +11,6 @@ import index.HashScan;
  */
 public class KeyScan extends Iterator{
 HashScan hs;
-Schema schema;
 HashIndex index;
 SearchKey key;
 HeapFile file;
@@ -20,10 +19,13 @@ boolean closed;
    * Constructs an index scan, given the hash index and schema.
    */
   public KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file) {
-    this.schema = schema;
+    this.setSchema(schema);
 	this.index = index;
 	this.key = key;
     hs = index.openScan(key);
+    if(hs.hasNext()==false){
+    	System.out.println("dfgdsfgsg");
+    }
     closed = false;
   }
 
@@ -72,11 +74,10 @@ boolean closed;
    */
   public Tuple getNext() {
 	  if(this.hasNext()){
-		  return new Tuple(schema, file.selectRecord(hs.getNext()));
+		  return new Tuple(this.getSchema(), file.selectRecord(hs.getNext()));
 	  }
 	  else{
-		  //DOUBT: Do Nothing
-		  return null;
+		  throw new IllegalStateException();
 	  } 
   }
 

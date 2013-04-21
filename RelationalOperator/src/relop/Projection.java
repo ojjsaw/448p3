@@ -6,15 +6,16 @@ package relop;
  */
 public class Projection extends Iterator {
 	Iterator iter;
-	Schema schema;
+	Integer[] fields;
   /**
    * Constructs a projection, given the underlying iterator and field numbers.
    */
   public Projection(Iterator iter, Integer... fields) {
 	  this.iter = iter;
-	  schema = new Schema(fields.length);
-	    for(Integer i : fields){
-	    	schema.initField(i, schema, fields[i]);
+	  this.fields = fields;
+	  this.setSchema(new Schema(fields.length));
+	    for(int i = 0; i < fields.length; i++){
+	    	this.getSchema().initField(i, iter.getSchema(), fields[i]);
 	    }
   }
 
@@ -60,7 +61,15 @@ public class Projection extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    return iter.getNext();
+	if(!this.hasNext()){
+		throw new IllegalStateException();
+	}
+    Tuple t = iter.getNext(); 
+    Tuple newtuple = new Tuple(this.getSchema());
+    for(int i = 0; i < fields.length; i++){
+    	newtuple.setField(i, t.getField(fields[i]));
+    }
+    return newtuple;
   }
 
 } // public class Projection extends Iterator
