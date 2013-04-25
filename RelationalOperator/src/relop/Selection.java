@@ -17,27 +17,34 @@ Schema schema;
    * Constructs a selection, given the underlying iterator and predicates.
    */
   public Selection(Iterator iter, Predicate... preds) {
-    schema = iter.getSchema();
-    for(Predicate pred : preds){
+    while(iter.hasNext()){
+    	boolean failed = false;
     	Tuple t = iter.getNext();
-    	if(pred.evaluate(t)){
-    		tuples.add(t);
-    	}
+	    for(Predicate pred : preds){	
+	    	if(!pred.evaluate(t)){
+	    		failed = true;
+	    	}
+	    }
+	    if(!failed){
+	    	tuples.add(t);
+	    }
     }
-    this.setSchema(schema);
     this.iter = tuples.iterator();
+    schema = iter.getSchema();
+    this.setSchema(schema); 
   }
 
   public Selection(SortMergeJoin join2, Predicate predicate) {
-	// TODO Auto-generated constructor stub
 	  schema = join2.getSchema();
-	  /*join2.restart();
-	    	Tuple t = join2.iter.next();
-	    	if(predicate.evaluate(t)){
-	    		tuples.add(t);
-	    	}*/
-	    this.setSchema(schema);
-	    this.iter = tuples.iterator();
+	  iter = join2.iter;
+	  while(iter.hasNext()){
+		  Tuple t = join2.iter.next();	
+		  if(predicate.evaluate(t)){
+		    		tuples.add(t);
+		  }
+	  }
+	  this.iter = tuples.iterator();
+	  this.setSchema(schema); 
 }
 
 /**

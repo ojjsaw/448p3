@@ -16,16 +16,21 @@ java.util.Iterator<Tuple> iter;
    */
   public SimpleJoin(Iterator left, Iterator right, Predicate... preds) {
     schema = Schema.join(left.getSchema(), right.getSchema());
-    //Begin algorithm
-    while(left.hasNext()){
-    	Tuple l = left.getNext();
-    	while(right.hasNext()){
+    	while(right.hasNext() && left.hasNext()){
+    		Tuple l = left.getNext();
     		Tuple r = right.getNext();
-    		if(l.data == r.data){
-    			tuples.add(Tuple.join(l,r,schema));
-    		}
+    	    boolean failed = false;
+    	    	Tuple t = Tuple.join(l,r,schema);
+    		    for(Predicate pred : preds){	
+    		    	if(!pred.evaluate(t)){
+    		    		failed = true;
+    		    	}
+    		    }
+    		    if(!failed){
+    		    	tuples.add(t);
+    		    }
         }
-    }
+   // }
     this.iter = tuples.iterator();
     this.setSchema(schema);
   }
