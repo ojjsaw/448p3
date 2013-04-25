@@ -20,21 +20,13 @@ boolean closed;
   /**
    * Constructs an index scan, given the hash index and schema.
    */
-ArrayList<Tuple> tuples = new ArrayList<Tuple>();
-java.util.Iterator<Tuple> iter;
   public KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file) {
     this.setSchema(schema);
+    this.file = file;
 	this.index = index;
 	this.key = key;
     hs = index.openScan(key);
-    if(hs.hasNext()==false){
-    	System.out.println("dfgdsfgsg");
-    }
     closed = false;
-    while(hs.hasNext()){
-    	tuples.add(new Tuple(this.getSchema(), file.selectRecord(hs.getNext())));
-    }
-    iter = tuples.iterator();
   }
 
   /**
@@ -49,9 +41,8 @@ java.util.Iterator<Tuple> iter;
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
-    //hs.close();
-    //hs = index.openScan(key);
-	  iter = tuples.iterator();
+    hs.close();
+    hs = index.openScan(key);
   }
 
   /**
@@ -65,7 +56,7 @@ java.util.Iterator<Tuple> iter;
    * Closes the iterator, releasing any resources (i.e. pinned pages).
    */
   public void close() {
-    iter = null;
+    hs.close();
 	closed = true;
   }
 
@@ -73,7 +64,7 @@ java.util.Iterator<Tuple> iter;
    * Returns true if there are more tuples, false otherwise.
    */
   public boolean hasNext() {
-    return iter.hasNext();
+    return hs.hasNext();
   }
 
   /**
@@ -82,12 +73,7 @@ java.util.Iterator<Tuple> iter;
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-	  if(this.hasNext()){
-		  return iter.next();
-	  }
-	  else{
-		  throw new IllegalStateException();
-	  } 
+	return new Tuple(this.getSchema(), file.selectRecord(hs.getNext()));
   }
 
 } // public class KeyScan extends Iterator
