@@ -21,7 +21,7 @@ java.util.Iterator<Tuple> iter;
     	Tuple l = left.getNext();
     	while(right.hasNext()){
     		Tuple r = right.getNext();
-    		if(l.equals(r)){
+    		if(l.data == r.data){
     			tuples.add(Tuple.join(l,r,schema));
     		}
         }

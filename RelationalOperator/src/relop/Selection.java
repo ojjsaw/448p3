@@ -12,11 +12,12 @@ import externalSort.SortMergeJoin;
 public class Selection extends Iterator {
 ArrayList<Tuple> tuples = new ArrayList<Tuple>();
 java.util.Iterator<Tuple> iter;
+Schema schema;
   /**
    * Constructs a selection, given the underlying iterator and predicates.
    */
   public Selection(Iterator iter, Predicate... preds) {
-    Schema schema = iter.getSchema();
+    schema = iter.getSchema();
     for(Predicate pred : preds){
     	Tuple t = iter.getNext();
     	if(pred.evaluate(t)){
@@ -29,6 +30,14 @@ java.util.Iterator<Tuple> iter;
 
   public Selection(SortMergeJoin join2, Predicate predicate) {
 	// TODO Auto-generated constructor stub
+	  schema = join2.getSchema();
+	  /*join2.restart();
+	    	Tuple t = join2.iter.next();
+	    	if(predicate.evaluate(t)){
+	    		tuples.add(t);
+	    	}*/
+	    this.setSchema(schema);
+	    this.iter = tuples.iterator();
 }
 
 /**
